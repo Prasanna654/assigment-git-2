@@ -17,3 +17,7 @@ resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.assignment2.id
   allocation_id = aws_eip.eip.id
 }
+
+
+
+https://github.com/visaltyagi/Terraform-Assignment-2/blob/main/Terraform%20Assignment%202%20Solution.docx
