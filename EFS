@@ -1,0 +1,97 @@
+Create the EFS File System
+Go to the EFS Console: https://console.aws.amazon.com/efs/
+
+Click “Create file system”.
+
+Choose:
+
+VPC: Select default or custom.
+
+Availability Zones and Subnets: Choose at least two AZs.
+
+Leave default options (for now), click “Next” through performance, lifecycle, policy settings.
+
+Create a security group for EFS that allows NFS (port 2049).
+
+Click “Create”.
+
+2️⃣ Create EC2 Instances
+Launch three EC2 instances, one for each OS:
+
+OS	AMI ID / Name
+Ubuntu	Ubuntu Server 22.04 LTS (or latest)
+Amazon Linux 2	Amazon Linux 2 AMI
+Red Hat Linux	Red Hat Enterprise Linux 8/9 (RHEL)
+
+During launch:
+
+Choose same VPC and subnets used for EFS.
+
+Use EFS security group + allow SSH (port 22) access.
+
+Create or use existing key pair for access.
+
+3️⃣ Install NFS Client on Each Instance
+Connect via SSH to each instance.
+
+🔷 Ubuntu:
+bash
+Copy
+Edit
+sudo apt update
+sudo apt install -y nfs-common
+🔷 Amazon Linux 2:
+bash
+Copy
+Edit
+sudo yum -y install nfs-utils
+🔷 Red Hat Enterprise Linux:
+bash
+Copy
+Edit
+sudo yum -y install nfs-utils
+4️⃣ Mount the EFS on All Instances
+Assume your EFS DNS name is like:
+
+bash
+Copy
+Edit
+fs-12345678.efs.us-east-1.amazonaws.com
+Replace fs-12345678 and region accordingly.
+
+Create a mount directory and mount it:
+
+bash
+Copy
+Edit
+sudo mkdir /mnt/efs
+sudo mount -t nfs4 -o nfsvers=4.1 fs-12345678.efs.us-east-1.amazonaws.com:/ /mnt/efs
+To mount it automatically on reboot, add to /etc/fstab:
+
+bash
+Copy
+Edit
+fs-12345678.efs.us-east-1.amazonaws.com:/ /mnt/efs nfs4 defaults,_netdev 0 0
+✅ Test EFS Sharing
+On one instance:
+
+bash
+Copy
+Edit
+echo "Hello from Ubuntu" | sudo tee /mnt/efs/test.txt
+On another instance:
+
+bash
+Copy
+Edit
+cat /mnt/efs/test.txt
+You should see the same file—this confirms that EFS is shared across all three instances.
+
+📌 Summary
+Component	Configured
+EFS	✅
+EC2 (Ubuntu)	✅
+EC2 (Amazon)	✅
+EC2 (RHEL)	✅
+NFS Client	✅
+EFS Mount	✅
